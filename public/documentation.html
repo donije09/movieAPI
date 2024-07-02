@@ -1,9 +1,176 @@
-<html>
-    <head>
-        <title> MOVIE API DOCUMENTATION</title>
-    </head>
-    <body>
-        <h1>MOVIE API</h1>
-        <p>This api allows users get informations about movies</p>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie API Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        .main {
+            background: #fff;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main">
+            <h1>Movie API Documentation</h1>
+            <h2>Endpoints</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Request</th>
+                        <th>URL</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GET</td>
+                        <td>/movies</td>
+                        <td>Returns a list of ALL movies</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/movies/:title</td>
+                        <td>Returns data (description, genre, director, image URL, whether it's featured or not) about a single movie by title</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/genres/:name</td>
+                        <td>Returns data (description) about a genre by name</td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/directors/:name</td>
+                        <td>Returns data (bio, birth year, death year) about a director by name</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/users</td>
+                        <td>Allows new users to register</td>
+                    </tr>
+                    <tr>
+                        <td>PUT</td>
+                        <td>/users/:username</td>
+                        <td>Allows users to update their user info (username)</td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/users/:username/movies/:movieID</td>
+                        <td>Allows users to add a movie to their list of favorites (showing only a text that a movie has been added)</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td>/users/:username/movies/:movieID</td>
+                        <td>Allows users to remove a movie from their list of favorites (showing only a text that a movie has been removed)</td>
+                    </tr>
+                    <tr>
+                        <td>DELETE</td>
+                        <td>/users/:username</td>
+                        <td>Allows existing users to deregister (showing only a text that a user email has been removed)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Endpoint Details</h2>
+
+            <h3>GET /movies</h3>
+            <p>Returns a list of ALL movies.</p>
+            <p><strong>URL:</strong> /movies</p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Query Parameters:</strong> None</p>
+            <p><strong>Response Format:</strong> JSON array of movie objects</p>
+
+            <h3>GET /movies/:title</h3>
+            <p>Returns data (description, genre, director, image URL, whether it's featured or not) about a single movie by title.</p>
+            <p><strong>URL:</strong> /movies/:title</p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Query Parameters:</strong> title (string)</p>
+            <p><strong>Response Format:</strong> JSON object of movie data</p>
+
+            <h3>GET /genres/:name</h3>
+            <p>Returns data (description) about a genre by name.</p>
+            <p><strong>URL:</strong> /genres/:name</p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Query Parameters:</strong> name (string)</p>
+            <p><strong>Response Format:</strong> JSON object with genre description</p>
+
+            <h3>GET /directors/:name</h3>
+            <p>Returns data (bio, birth year, death year) about a director by name.</p>
+            <p><strong>URL:</strong> /directors/:name</p>
+            <p><strong>Method:</strong> GET</p>
+            <p><strong>Query Parameters:</strong> name (string)</p>
+            <p><strong>Response Format:</strong> JSON object with director data</p>
+
+            <h3>POST /users</h3>
+            <p>Allows new users to register.</p>
+            <p><strong>URL:</strong> /users</p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Body Format:</strong> JSON object with user data</p>
+            <p><strong>Response Format:</strong> Text confirming registration</p>
+
+            <h3>PUT /users/:username</h3>
+            <p>Allows users to update their user info (username).</p>
+            <p><strong>URL:</strong> /users/:username</p>
+            <p><strong>Method:</strong> PUT</p>
+            <p><strong>Query Parameters:</strong> username (string)</p>
+            <p><strong>Body Format:</strong> JSON object with updated user data</p>
+            <p><strong>Response Format:</strong> Text confirming update</p>
+
+            <h3>POST /users/:username/movies/:movieID</h3>
+            <p>Allows users to add a movie to their list of favorites.</p>
+            <p><strong>URL:</strong> /users/:username/movies/:movieID</p>
+            <p><strong>Method:</strong> POST</p>
+            <p><strong>Query Parameters:</strong> username (string), movieID (string)</p>
+            <p><strong>Response Format:</strong> Text confirming addition</p>
+
+            <h3>DELETE /users/:username/movies/:movieID</h3>
+            <p>Allows users to remove a movie from their list of favorites.</p>
+            <p><strong>URL:</strong> /users/:username/movies/:movieID</p>
+            <p><strong>Method:</strong> DELETE</p>
+            <p><strong>Query Parameters:</strong> username (string), movieID (string)</p>
+            <p><strong>Response Format:</strong> Text confirming removal</p>
+
+            <h3>DELETE /users/:username</h3>
+            <p>Allows existing users to deregister.</p>
+            <p><strong>URL:</strong> /users/:username</p>
+            <p><strong>Method:</strong> DELETE</p>
+            <p><strong>Query Parameters:</strong> username (string)</p>
+            <p><strong>Response Format:</strong> Text confirming de-registration</p>
+        </div>
+    </div>
+</body>
 </html>
