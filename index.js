@@ -5,13 +5,16 @@ const path = require('path');
 const passport = require('passport');
 const { Movie, User } = require('./models');
 const auth = require('./auth'); // Correctly import auth.js
-
+const cors = require('cors');
 const app = express();
+const { body, validationResult } = require('express-validator');
+
 
 app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 
 mongoose.connect('mongodb://localhost:27017/movieDB', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
@@ -76,7 +79,18 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
   }
 });
 
-app.post('/users', async (req, res) => {
+app.post('/users', [
+  body('username').isLength({ min: 5}).withMessage('username must be at lest 5 charaters'),
+  body('password').isLength({ min: 8}).withMessage('password must be at least 8 charaters'),
+  body('email').isEmail().withMessage('email is not valid')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()){
+    return res.status(422).json({ errors: errors.array() });
+  }
+
+
+  
   try {
     const hashedPassword = User.hashPassword(req.body.password);
     const newUser = new User({
@@ -93,7 +107,16 @@ app.post('/users', async (req, res) => {
   }
 });
 
-app.put('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.put('/users/:username', 
+  [
+    body('username').isLength({ min: 5}).withMessage('username must be at lest 5 charaters'),
+    body('password').isLength({ min: 8}).withMessage('password must be at least 8 charaters'),
+    body('email').isEmail().withMessage('email is not valid')
+  ], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+      return res.status(422).json({ errors: errors.array() });
+    }
   try {
     const updatedUser = await User.findOneAndUpdate(
       { username: req.params.username },
