@@ -7,6 +7,23 @@ const cors = require('cors');
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      // Any additional options
+    });
+    console.log('MongoDB Connected...');
+  } catch (err) {
+    console.error(err.message);
+    process.exit(1);
+  }
+};
+
+connectDB();
+
+
 const { Movie, User } = require('./models');
 const auth = require('./auth'); // Correctly import auth.js
 
