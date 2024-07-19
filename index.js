@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const morgan = require('morgan');
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/movieDB';
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });const morgan = require('morgan');
 const path = require('path');
 const passport = require('passport');
 const { Movie, User } = require('./models');
