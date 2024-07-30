@@ -21,6 +21,31 @@ mongoose.connect('mongodb+srv://ustinedon:movie200@donik009.61cgbhd.mongodb.net/
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
+
+
+  app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+  
+    try {
+      const user = await User.findOne({ username });
+      if (!user) {
+        return res.status(401).json({ message: 'Incorrect username or password.' });
+      }
+  
+      const isPasswordValid = user.validatePassword(password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Incorrect username or password.' });
+      }
+  
+      const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  
+      res.json({ user, token });
+    } catch (err) {
+      console.error('Error during login:', err);
+      res.status(500).json({ message: 'Internal server error.' });
+    }
+  });
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'documentation.html'));
 });
