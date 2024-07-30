@@ -21,9 +21,7 @@ app.use(cors());
 
   //mongoose.connect('mongodb+srv://ustinedon:word200@donik009.61cgbhd.mongodb.net/donik009?retryWrites=true&w=majority&appName=donik009', { useNewUrlParser: true, useUnifiedTopology: true });
   mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'documentation.html'));
-});
+
 
 // Use the auth routes
 auth(app);
