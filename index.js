@@ -27,7 +27,9 @@ app.get('/', (req, res) => {
 
 // Use the auth routes
 auth(app);
-
+app.get("/", (req, res) => {
+  res.send("Welcome to MyFlix");
+});
 // Define the login endpoint using name
 app.post('/login', async (req, res) => {
   const { name, password } = req.body;
