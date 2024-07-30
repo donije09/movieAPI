@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-/* mongoose.connect('mongodb+srv://ustinedon:movie200@donik009.61cgbhd.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=donik009',
+mongoose.connect('mongodb+srv://<username>:<password>@<cluster-url>/myFlixDB?retryWrites=true&w=majority', 
   { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err)); */
