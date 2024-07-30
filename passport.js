@@ -1,45 +1,36 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const passportJWT = require('passport-jwt');
-
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
 const { User } = require('./models');
-const JWTStrategy = passportJWT.Strategy;
-const ExtractJWT = passportJWT.ExtractJwt;
 
 passport.use(new LocalStrategy({
   usernameField: 'username',
   passwordField: 'password'
-}, (username, password, callback) => {
-  User.findOne({ username: username }, (error, user) => {
-    if (error) {
-      console.error(error);
-      return callback(error);
-    }
-
+}, (username, password, done) => {
+  User.findOne({ username: username }, (err, user) => {
+    if (err) { return done(err); }
     if (!user) {
-      console.log('Incorrect username');
-      return callback(null, false, { message: 'Incorrect username.' });
+      return done(null, false, { message: 'Incorrect username.' });
     }
-
     if (!user.validatePassword(password)) {
-      console.log('Incorrect password');
-      return callback(null, false, { message: 'Incorrect password.' });
+      return done(null, false, { message: 'Incorrect password.' });
     }
-
-    console.log('Finished');
-    return callback(null, user);
+    return done(null, user);
   });
 }));
 
-passport.use(new JWTStrategy({
-  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET
-}, (jwtPayload, callback) => {
-  return User.findById(jwtPayload.id)
-    .then((user) => {
-      return callback(null, user);
+const jwtSecret = 'your_jwt_secret'; // Replace with your actual secret
+
+passport.use(new JwtStrategy({
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtSecret
+}, (jwtPayload, done) => {
+  return User.findById(jwtPayload._id)
+    .then(user => {
+      return done(null, user);
     })
-    .catch((error) => {
-      return callback(error);
+    .catch(err => {
+      return done(err);
     });
 }));
