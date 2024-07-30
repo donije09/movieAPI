@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const passport = require('passport');
 const cors = require('cors');
-const jwt = require('jsonwebtoken'); // Add this line
+const jwt = require('jsonwebtoken');
 const { Movie, User } = require('./models');
 const auth = require('./auth'); // Correctly import auth.js
 require('./passport'); // Ensure passport strategies are loaded
@@ -18,8 +18,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-mongoose.connect('mongodb+srv://ustinedon:movie200@donik009.61cgbhd.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=donik009',
-  { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -32,20 +34,20 @@ auth(app);
 
 // Define the login endpoint
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
+  const { name, password } = req.body;
 
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ name });
     if (!user) {
-      return res.status(401).json({ message: 'Incorrect username or password.' });
+      return res.status(401).json({ message: 'Incorrect name or password.' });
     }
 
     const isPasswordValid = user.validatePassword(password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Incorrect username or password.' });
+      return res.status(401).json({ message: 'Incorrect name or password.' });
     }
 
-    const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, name: user.name }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ user, token });
   } catch (err) {
@@ -110,10 +112,10 @@ app.post('/users', async (req, res) => {
   try {
     const hashedPassword = User.hashPassword(req.body.password);
     const newUser = new User({
-      username: req.body.username,
-      password: hashedPassword,
+      name: req.body.name,
       email: req.body.email,
-      birthday: req.body.birthday
+      password: hashedPassword,
+      favoriteMovies: req.body.favoriteMovies || [] // Optional: if you want to initialize with favorite movies
     });
     await newUser.save();
     res.status(201).send(newUser);
@@ -123,10 +125,10 @@ app.post('/users', async (req, res) => {
   }
 });
 
-app.put('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.put('/users/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
-      { username: req.params.username },
+      { name: req.params.name },
       { $set: req.body },
       { new: true }
     );
@@ -140,10 +142,10 @@ app.put('/users/:username', passport.authenticate('jwt', { session: false }), as
   }
 });
 
-app.post('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.post('/users/:name/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const user = await User.findOneAndUpdate(
-      { username: req.params.username },
+      { name: req.params.name },
       { $addToSet: { favoriteMovies: req.params.movieId } },
       { new: true }
     );
@@ -157,10 +159,10 @@ app.post('/users/:username/movies/:movieId', passport.authenticate('jwt', { sess
   }
 });
 
-app.delete('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:name/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const user = await User.findOneAndUpdate(
-      { username: req.params.username },
+      { name: req.params.name },
       { $pull: { favoriteMovies: req.params.movieId } },
       { new: true }
     );
@@ -174,9 +176,9 @@ app.delete('/users/:username/movies/:movieId', passport.authenticate('jwt', { se
   }
 });
 
-app.delete('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const user = await User.findOneAndDelete({ username: req.params.username });
+    const user = await User.findOneAndDelete({ name: req.params.name });
     if (!user) {
       return res.status(404).send('User not found');
     }
