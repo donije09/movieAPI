@@ -18,10 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect('mongodb+srv://ustinedon:movie200@donik009.61cgbhd.mongodb.net/sample_mflix?retryWrites=true&w=majority&appName=donik009',
+  { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
@@ -32,7 +30,7 @@ app.get('/', (req, res) => {
 // Use the auth routes
 auth(app);
 
-// Define the login endpoint
+// Define the login endpoint using name
 app.post('/login', async (req, res) => {
   const { name, password } = req.body;
 
@@ -42,7 +40,7 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Incorrect name or password.' });
     }
 
-    const isPasswordValid = user.validatePassword(password);
+    const isPasswordValid = await user.validatePassword(password); // Assume validatePassword is async
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Incorrect name or password.' });
     }
@@ -110,12 +108,12 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
 
 app.post('/users', async (req, res) => {
   try {
-    const hashedPassword = User.hashPassword(req.body.password);
+    const hashedPassword = await User.hashPassword(req.body.password); // Assume hashPassword is async
     const newUser = new User({
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      favoriteMovies: req.body.favoriteMovies || [] // Optional: if you want to initialize with favorite movies
+      favoriteMovies: req.body.favoriteMovies || []
     });
     await newUser.save();
     res.status(201).send(newUser);
