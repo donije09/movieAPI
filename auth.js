@@ -1,42 +1,35 @@
-const jwtSecret = 'your_jwt_secret';
-const jwt = require('jsonwebtoken');
 const passport = require('passport');
-require('./passport'); // Include local passport file
+const jwt = require('jsonwebtoken');
+const { User } = require('./models');
 
-const express = require('express');
-const router = express.Router();
+require('./passport'); // Ensure passport strategies are loaded
 
-router.post('/login', (req, res) => {
-  passport.authenticate('local', { session: false }, (err, user, info) => {
-    if (err) {
-      console.error('Authentication error:', err);
-      return res.status(400).json({
-        message: 'Something is not right',
-        error: err
-      });
-    }
+const jwtSecret = 'your_jwt_secret'; // Replace with your actual secret
 
-    if (!user) {
-      console.error('User not found or incorrect password:', info);
-      return res.status(400).json({
-        message: 'Something is not right',
-        info: info
-      });
-    }
+const generateJWTToken = (user) => {
+  return jwt.sign(user, jwtSecret, {
+    subject: user.username,
+    expiresIn: '7d',
+    algorithm: 'HS256'
+  });
+};
 
-    req.login(user, { session: false }, (err) => {
-      if (err) {
-        console.error('Login error:', err);
-        res.send(err);
+module.exports = (app) => {
+  app.post('/login', (req, res) => {
+    passport.authenticate('local', { session: false }, (error, user, info) => {
+      if (error || !user) {
+        return res.status(400).json({
+          message: 'Something is not right',
+          user: user
+        });
       }
-
-      const token = jwt.sign(user.toJSON(), jwtSecret, {
-        expiresIn: '1h'
+      req.login(user, { session: false }, (err) => {
+        if (err) {
+          res.send(err);
+        }
+        const token = generateJWTToken(user.toJSON());
+        return res.json({ user, token });
       });
-
-      return res.json({ user, token });
-    });
-  })(req, res);
-});
-
-module.exports = router;
+    })(req, res);
+  });
+};
