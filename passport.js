@@ -7,17 +7,20 @@ const { User } = require('./models');
 passport.use(new LocalStrategy({
   usernameField: 'name',
   passwordField: 'password'
-}, (name, password, done) => {
-  User.findOne({ username: name }, (err, user) => {
-    if (err) { return done(err); }
+}, async (name, password, done) => {
+  try {
+    const user = await User.findOne({ name });
     if (!user) {
       return done(null, false, { message: 'Incorrect username.' });
     }
-    if (!user.validatePassword(password)) {
+    const isValid = await user.validatePassword(password);
+    if (!isValid) {
       return done(null, false, { message: 'Incorrect password.' });
     }
     return done(null, user);
-  });
+  } catch (err) {
+    return done(err);
+  }
 }));
 
 const jwtSecret = 'your_jwt_secret'; // Replace with your actual secret

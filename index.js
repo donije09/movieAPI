@@ -18,38 +18,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-
-  //mongoose.connect('mongodb+srv://ustinedon:word200@donik009.61cgbhd.mongodb.net/donik009?retryWrites=true&w=majority&appName=donik009', { useNewUrlParser: true, useUnifiedTopology: true });
-  mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Use the auth routes
 auth(app);
+
 app.get("/", (req, res) => {
   res.send("Welcome to MyFlix");
-});
-// Define the login endpoint using name
-app.post('/login', async (req, res) => {
-  const { name, password } = req.body;
-
-  try {
-    const user = await User.findOne({ name });
-    if (!user) {
-      return res.status(401).json({ message: 'Incorrect name or password.' });
-    }
-
-    const isPasswordValid = await user.validatePassword(password); // Assume validatePassword is async
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Incorrect name or password.' });
-    }
-
-    const token = jwt.sign({ id: user._id, name: user.name }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.json({ user, token });
-  } catch (err) {
-    console.error('Error during login:', err); // More detailed error logging
-    res.status(500).json({ message: 'Internal server error.', error: err.message }); // Include error message in response
-  }
 });
 
 // Define all other routes
