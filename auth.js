@@ -8,7 +8,7 @@ const jwtSecret = 'your_jwt_secret'; // Replace with your actual secret
 
 const generateJWTToken = (user) => {
   return jwt.sign(user, jwtSecret, {
-    subject: user.name,
+    subject: User.name,
     expiresIn: '7d',
     algorithm: 'HS256'
   });
