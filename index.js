@@ -79,7 +79,7 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
   }
 });
 
-app.post('/users', async (req, res) => {
+/* app.post('/users', async (req, res) => {
   try {
     const hashedPassword = await User.hashPassword(req.body.password); // Assume hashPassword is async
     const newUser = new User({
@@ -94,7 +94,37 @@ app.post('/users', async (req, res) => {
     console.error('Error creating user:', err);
     res.status(500).send('Internal server error');
   }
+}); */
+app.post('/users', async (req, res) => {
+  try {
+    // Basic validation of the request body
+    if (!req.body.name || !req.body.email || !req.body.password) {
+      return res.status(400).send('Missing required fields');
+    }
+
+    // Hash the password
+    const hashedPassword = await User.hashPassword(req.body.password);
+
+    // Create a new user instance
+    const newUser = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: hashedPassword,
+      favoriteMovies: req.body.favoriteMovies || []
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Respond with the created user
+    res.status(201).send(newUser);
+  } catch (err) {
+    console.error('Error creating user:', err);
+    res.status(500).send('Internal server error');
+  }
 });
+
+
 
 app.put('/users/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
