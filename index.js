@@ -20,7 +20,7 @@ app.use(cors());
 
 
   //mongoose.connect('mongodb+srv://ustinedon:word200@donik009.61cgbhd.mongodb.net/donik009?retryWrites=true&w=majority&appName=donik009', { useNewUrlParser: true, useUnifiedTopology: true });
-  mongoose.connect( process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  mongoose.connect( process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 // Use the auth routes
