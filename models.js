@@ -38,7 +38,7 @@ userSchema.methods.validatePassword = async function(password) {
 };
 
 // Create the User model
-const User = mongoose.models('User', userSchema);
+const User = mongoose.model('User', userSchema);
 
 // Define the Movie schema
 const movieSchema = new mongoose.Schema({
@@ -72,6 +72,6 @@ const movieSchema = new mongoose.Schema({
 });
 
 // Create the Movie model
-const Movie = mongoose.models('Movie', movieSchema);
+const Movie = mongoose.model('Movie', movieSchema);
 
 module.exports = { User, Movie };
