@@ -79,7 +79,7 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
   }
 });
 
-/* app.post('/users', async (req, res) => {
+app.post('/users', async (req, res) => {
   try {
     const hashedPassword = await User.hashPassword(req.body.password); // Assume hashPassword is async
     const newUser = new User({
@@ -94,7 +94,7 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
     console.error('Error creating user:', err);
     res.status(500).send('Internal server error');
   }
-}); */
+});
 app.post('/users', async (req, res) => {
   try {
     // Validate the incoming request data
