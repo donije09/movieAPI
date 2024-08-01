@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 app.use(passport.initialize()); // Initialize passport middleware
 // Connect to MongoDB
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 5000 })
+mongoose.connect(process.env.CONNECTION_URI, {serverSelectionTimeoutMS: 5000 })
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
