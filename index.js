@@ -5,20 +5,23 @@ const morgan = require('morgan');
 const path = require('path');
 const passport = require('passport');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 const { Movie, User } = require('./model'); // Adjusted to match model.js filename
 const auth = require('./auth'); // Correctly import auth.js
 require('./passport'); // Ensure passport strategies are loaded
 
 const app = express();
 
+// Middleware
 app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+// Connect to MongoDB
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
 
 // Use the auth routes
 auth(app);
@@ -27,7 +30,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to MyFlix");
 });
 
-// Define all other routes
+// Routes
 app.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const movies = await Movie.find();
@@ -81,11 +84,9 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
 
 app.post('/users', async (req, res) => {
   try {
-    const user = new User({
-      username: req.body.username,
-      password: req.body.password
-    });
-    await user.hashPassword();
+    const { username, password } = req.body;
+    const user = new User({ username, password });
+    await user.hashPassword(); // Hash the password before saving
     await user.save();
     res.status(201).send(user);
   } catch (err) {
