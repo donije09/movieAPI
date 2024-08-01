@@ -8,7 +8,6 @@ const cors = require('cors');
 const { Movie, User } = require('./models'); // Adjusted to match models.js filename
 const auth = require('./auth'); // Correctly import auth.js
 require('./passport'); // Ensure passport strategies are loaded
-
 const app = express();
 
 // Middleware
@@ -17,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
-
+app.use(passport.initialize()); // Initialize passport middleware
 // Connect to MongoDB
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
