@@ -1,20 +1,26 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// Define the User schema
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  favoriteMovies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Movie' }]
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
 });
 
-userSchema.statics.hashPassword = async function (password) {
-  return await bcrypt.hash(password, 10);
+// Method to hash password before saving
+userSchema.methods.hashPassword = async function() {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 };
 
-userSchema.methods.validatePassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
-};
-
+// Create the User model
 const User = mongoose.model('User', userSchema);
+
 module.exports = User;

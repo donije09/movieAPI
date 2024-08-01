@@ -6,7 +6,7 @@ const path = require('path');
 const passport = require('passport');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const { Movie, User } = require('./models');
+const { Movie, User } = require('./model'); // Adjusted to match model.js filename
 const auth = require('./auth'); // Correctly import auth.js
 require('./passport'); // Ensure passport strategies are loaded
 
@@ -81,25 +81,23 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
 
 app.post('/users', async (req, res) => {
   try {
-    const hashedPassword = await User.hashPassword(req.body.password); // Assume hashPassword is async
-    const newUser = new User({
-      name: req.body.name,
-      email: req.body.email,
-      password: hashedPassword,
-      favoriteMovies: req.body.favoriteMovies || []
+    const user = new User({
+      username: req.body.username,
+      password: req.body.password
     });
-    await newUser.save();
-    res.status(201).send(newUser);
+    await user.hashPassword();
+    await user.save();
+    res.status(201).send(user);
   } catch (err) {
     console.error('Error creating user:', err);
     res.status(500).send('Internal server error');
   }
 });
 
-app.put('/users/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.put('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
-      { name: req.params.name },
+      { username: req.params.username },
       { $set: req.body },
       { new: true }
     );
@@ -113,10 +111,10 @@ app.put('/users/:name', passport.authenticate('jwt', { session: false }), async 
   }
 });
 
-app.post('/users/:name/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.post('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const user = await User.findOneAndUpdate(
-      { name: req.params.name },
+      { username: req.params.username },
       { $addToSet: { favoriteMovies: req.params.movieId } },
       { new: true }
     );
@@ -130,10 +128,10 @@ app.post('/users/:name/movies/:movieId', passport.authenticate('jwt', { session:
   }
 });
 
-app.delete('/users/:name/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const user = await User.findOneAndUpdate(
-      { name: req.params.name },
+      { username: req.params.username },
       { $pull: { favoriteMovies: req.params.movieId } },
       { new: true }
     );
@@ -147,9 +145,9 @@ app.delete('/users/:name/movies/:movieId', passport.authenticate('jwt', { sessio
   }
 });
 
-app.delete('/users/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const user = await User.findOneAndDelete({ name: req.params.name });
+    const user = await User.findOneAndDelete({ username: req.params.username });
     if (!user) {
       return res.status(404).send('User not found');
     }
