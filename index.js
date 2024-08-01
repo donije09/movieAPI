@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const { Movie, User } = require('./models');
 const auth = require('./auth'); // Correctly import auth.js
 require('./passport'); // Ensure passport strategies are loaded
-const User = require('./models/user');
+
 const app = express();
 
 app.use(morgan('common'));
@@ -95,42 +95,6 @@ app.post('/users', async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
-app.post('/users', async (req, res) => {
-  try {
-    // Validate the incoming request data
-    const { name, email, password, favoriteMovies } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).send('Name, email, and password are required');
-    }
-
-    // Check for an existing user with the same email
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).send('Email already in use');
-    }
-
-    // Hash the password
-    const hashedPassword = await User.hashPassword(password);
-
-    // Create a new user instance
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      favoriteMovies: favoriteMovies || []
-    });
-
-    // Save the user to the database
-    await newUser.save();
-
-    // Send the created user as a response
-    res.status(201).send(newUser);
-  } catch (err) {
-    console.error('Error creating user:', err);
-    res.status(500).send('Internal server error');
-  }
-});
-
 
 app.put('/users/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
