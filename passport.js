@@ -1,15 +1,17 @@
- const passport = require('passport');
+const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const { User } = require('./models');
 
+const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret'; // Use environment variable
+
 passport.use(new LocalStrategy({
-  usernameField: 'name',
+  usernameField: 'username',
   passwordField: 'password'
-}, async (name, password, done) => {
+}, async (username, password, done) => {
   try {
-    const user = await User.findOne({ name });
+    const user = await User.findOne({ username });
     if (!user) {
       return done(null, false, { message: 'Incorrect username.' });
     }
@@ -23,8 +25,6 @@ passport.use(new LocalStrategy({
   }
 }));
 
-const jwtSecret = 'your_jwt_secret'; // Replace with your actual secret
-
 passport.use(new JwtStrategy({
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: jwtSecret
@@ -37,4 +37,3 @@ passport.use(new JwtStrategy({
       return done(err);
     });
 }));
- 

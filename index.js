@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const path = require('path');
 const passport = require('passport');
 const cors = require('cors');
-const { Movie, User } = require('./model'); // Adjusted to match model.js filename
+const { Movie, User } = require('./models'); // Adjusted to match models.js filename
 const auth = require('./auth'); // Correctly import auth.js
 require('./passport'); // Ensure passport strategies are loaded
 
@@ -56,7 +56,7 @@ app.get('/movies/:title', passport.authenticate('jwt', { session: false }), asyn
 
 app.get('/genres/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const movies = await Movie.find({ 'genre.name': req.params.name });
+    const movies = await Movie.find({ genre: req.params.name });
     if (movies.length === 0) {
       return res.status(404).send('Genre not found');
     }
@@ -70,7 +70,7 @@ app.get('/genres/:name', passport.authenticate('jwt', { session: false }), async
 
 app.get('/directors/:name', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const movies = await Movie.find({ 'director.name': req.params.name });
+    const movies = await Movie.find({ director: req.params.name });
     if (movies.length === 0) {
       return res.status(404).send('Director not found');
     }
@@ -84,8 +84,8 @@ app.get('/directors/:name', passport.authenticate('jwt', { session: false }), as
 
 app.post('/users', async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = new User({ username, password });
+    const { username, password, email, birthday } = req.body;
+    const user = new User({ username, password, email, birthday });
     await user.hashPassword(); // Hash the password before saving
     await user.save();
     res.status(201).send(user);
