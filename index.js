@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 app.use(passport.initialize()); // Initialize passport middleware
 // Connect to MongoDB
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.CONNECTION_URI, {serverSelectionTimeoutMS: 5000 })
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('Error connecting to MongoDB:', err));
 
@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.get('/movies', async (req, res) => {
   try {
     const movies = await Movie.find();
     res.json(movies);
